@@ -1,4 +1,4 @@
-import openai
+from import openai
 
 # 將你的OpenAI API 密鑰替換成你的密鑰
 openai.api_key = 'your-api-key'
