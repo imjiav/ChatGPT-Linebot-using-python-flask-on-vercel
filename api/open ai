@@ -1,0 +1,21 @@
+import openai
+
+# 將你的OpenAI API 密鑰替換成你的密鑰
+openai.api_key = 'your-api-key'
+
+def chat_with_gpt(prompt):
+    response = openai.Completion.create(
+        engine="davinci-codex",  # 或者你想用的任何其他引擎，如"curie"
+        prompt=prompt,
+        temperature=0.7,
+        max_tokens=150
+    )
+    return response.choices[0].text.strip()
+
+# 你可以以任何你想要開始對話的方式開始
+user_input = input("你：")
+
+while user_input.lower() != '退出':
+    response = chat_with_gpt(user_input)
+    print("ChatGPT:", response)
+    user_input = input("你：")
