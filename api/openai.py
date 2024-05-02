@@ -8,11 +8,11 @@ import Openai
 app = Flask(__name__)
 
 # 設置LineBot的Channel Access Token和Channel Secret
-line_bot_api = LineBotApi(QAEbpvqmuGhyDdPpp3DLZB6mcFUQ+LYRilL/377TN1oUvaU5A/NsguwCGUnOMr8BekXOcasOkC9v0oxnBIuZWoZFR/bXBET9R1STLPM9DT7Z6t4tOfED8usPKHndrJwE+tVEuek7pju5sRbwsfrPewdB04t89/1O/w1cDnyilFU=)
-handler = WebhookHandler(85939a38907cbf190531aa4a65ab818d)
+line_bot_api = LineBotApi("QAEbpvqmuGhyDdPpp3DLZB6mcFUQ+LYRilL/377TN1oUvaU5A/NsguwCGUnOMr8BekXOcasOkC9v0oxnBIuZWoZFR/bXBET9R1STLPM9DT7Z6t4tOfED8usPKHndrJwE+tVEuek7pju5sRbwsfrPewdB04t89/1O/w1cDnyilFU=")
+handler = WebhookHandler("85939a38907cbf190531aa4a65ab818d")
 
 # 設置OpenAI API 密鑰
-openai.api_key = sk-proj-JAvUukDHjjcIG37TaF0VT3BlbkFJ4zLBwB3JBS6YZcAJubCO
+openai.api_key ="sk-proj-JAvUukDHjjcIG37TaF0VT3BlbkFJ4zLBwB3JBS6YZcAJubCO"
 
 # 與GPT模型交互的函數
 def chat_with_gpt(prompt):
