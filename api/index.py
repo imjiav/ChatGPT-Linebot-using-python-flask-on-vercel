@@ -39,11 +39,11 @@ def handle_message(event):
     if event.message.type != "text":
         return
 
-    if event.message.text == "說話":
-        working_status = True
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="歡迎互動"))
+    # if event.message.text == "說話":
+    #     working_status = True
+    #     line_bot_api.reply_message(
+    #         event.reply_token,
+    #         TextSendMessage(text="歡迎互動"))
         return
 
     if event.message.text == "安靜":
@@ -53,7 +53,8 @@ def handle_message(event):
             TextSendMessage(text="好的 若想要我繼續說話 請跟我說 「說話」"))
         return
 
-    if working_status:
+    # if working_status:
+    if event.message.text == "說話":
         chatgpt.add_msg(f"HUMAN:{event.message.text}?\n")
         reply_msg = chatgpt.get_response().replace("AI:", "", 1)
         chatgpt.add_msg(f"AI:{reply_msg}\n")
