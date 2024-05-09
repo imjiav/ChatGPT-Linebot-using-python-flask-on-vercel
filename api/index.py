@@ -43,14 +43,14 @@ def handle_message(event):
         working_status = True
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text="歡迎來跟08互動 ^_^ "))
+            TextSendMessage(text="歡迎互動"))
         return
 
-    if event.message.text == "閉嘴":
+    if event.message.text == "安靜":
         working_status = False
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text="好的，我乖乖閉嘴 > <，如果想要我繼續說話，請跟我說 「說話」 > <"))
+            TextSendMessage(text="好的 若想要我繼續說話 請跟我說 「說話」"))
         return
 
     if working_status:
