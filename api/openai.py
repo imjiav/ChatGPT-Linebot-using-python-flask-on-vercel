@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 # 設置LineBot的Channel Access Token和Channel Secret
 line_bot_api = LineBotApi("LINE_CHANNEL_ACCESS_TOKEN")
-handler = WebhookHandler("85939a38907cbf190531aa4a65ab818d")
+handler = WebhookHandler("LINE_CHANNEL_SECRET")
 
 # 設置OpenAI API 密鑰
 openai.api_key ="sk-proj-JAvUukDHjjcIG37TaF0VT3BlbkFJ4zLBwB3JBS6YZcAJubCO"
