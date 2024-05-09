@@ -19,8 +19,8 @@ def chat_with_gpt(prompt):
     response = openai.Completion.create(
         engine="davinci-codex",  # 或者你想用的其他引擎
         prompt=prompt,
-        temperature=0.7,
-        max_tokens=150
+        temperature=0,
+        max_tokens=zh
     )
     return response.choices[0].text.strip()
 
