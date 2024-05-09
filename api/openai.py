@@ -12,7 +12,7 @@ line_bot_api = LineBotApi("LINE_CHANNEL_ACCESS_TOKEN")
 handler = WebhookHandler("LINE_CHANNEL_SECRET")
 
 # 設置OpenAI API 密鑰
-openai.api_key ="sk-proj-JAvUukDHjjcIG37TaF0VT3BlbkFJ4zLBwB3JBS6YZcAJubCO"
+openai.api_key ="OPEN_AI_KEY"
 
 # 與GPT模型交互的函數
 def chat_with_gpt(prompt):
