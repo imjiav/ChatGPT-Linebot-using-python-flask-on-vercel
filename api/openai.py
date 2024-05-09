@@ -27,8 +27,8 @@ def chat_with_gpt(prompt):
     return response.choices[0].text.strip()
 
 # Line的Webhook接口
-@app.route("/callback", methods=['POST'])
-def callback():
+@app.route("/webhook", methods=['POST'])
+def webhook():
     signature = request.headers['X-Line-Signature']
 
     # 獲取request的body
