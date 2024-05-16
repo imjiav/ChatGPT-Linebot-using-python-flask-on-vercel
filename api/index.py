@@ -1,97 +1,66 @@
 from flask import Flask, request, abort
-import os
-import json
-import requests
-import cfg
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
+from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from api.chatgpt import ChatGPT
+
+import os
+
+line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
+line_handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
+working_status = os.getenv("DEFALUT_TALKING", default = "true").lower() == "true"
 
 app = Flask(__name__)
+chatgpt = ChatGPT()
 
-# 設置LINE Bot的API URL和Token
-LINE_API_URL = "https://api.line.me/v2/bot/message/reply"
-LINE_ACCESS_TOKEN = cfg.LINE_BOT_TOKEN
-LINE_SECRET = cfg.LINE_BOT_SECRET
-handler = WebhookHandler(LINE_SECRET)
+# domain root
+@app.route('/')
+def home():
+    return 'Hello, World!'
 
-# 設置OpenAI API的URL和密鑰
-OPENAI_API_KEY = cfg.OPEN_AI_API_KEY
-
-
-@app.route("/")
-def welcome():
-    return "welcome to my flask web service"
-
-
-@app.route("/t")
-def test():
-    return "testing page"
-
-
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    # 接收LINE Bot的請求
+@app.route("/webhook", methods=['POST'])
+def callback():
+    # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
+    # get request body as text
     body = request.get_data(as_text=True)
-
+    app.logger.info("Request body: " + body)
+    # handle webhook body
     try:
-        # 驗證 Webhook 請求是否來自 LINE 平臺
-        handler.handle(body, signature)
+        line_handler.handle(body, signature)
     except InvalidSignatureError:
-        # 如果不是來自 LINE 平臺的 Webhook 請求，則拋出錯誤
         abort(400)
-
-    # 如果是來自 LINE 平臺的 Webhook 請求，則處理訊息事件
-    events = json.loads(body)["events"]
-    for event in events:
-        if event["type"] == "message" and event["message"]["type"] == "text":
-            # 取得使用者 ID 和訊息內容
-            user_id = event["source"]["userId"]
-            message_text = event["message"]["text"]
-
-            # 調用OpenAI API進行文本生成
-            response = generate_text(message_text)
-
-            # 回復用戶的消息
-            headers = {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + LINE_ACCESS_TOKEN
-            }
-            data = {
-                'replyToken': event['replyToken'],
-                'messages': [{
-                    'type': 'text',
-                    'text': response
-                }]
-            }
-            requests.post(LINE_API_URL, headers=headers, data=json.dumps(data))
-
-    return 'OK', 200
+    return 'OK'
 
 
-def generate_text(prompt):
-    # 設置OpenAI API請求的數據
-    data = {
-        'prompt': prompt,
-        'temperature': 0.5,
-        'max_tokens': 500,
-        "model": "davinci",
-        'stop': '\n',
-    }
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + OPENAI_API_KEY
-    }
+@line_handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    global working_status
+    if event.message.type != "text":
+        return
 
-    # 發送OpenAI API請求
-    response = requests.post(cfg.OPENAI_ENDPOINT, headers=headers, json=data)
-    response_data = json.loads(response.content)
+    if event.message.text == "說話":
+        working_status = True
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="歡迎互動"))
+        return
 
-    # 解析OpenAI API的響應數據
-    message = response_data['choices'][0]['text'].strip()
-    return message
+    if event.message.text == "安靜":
+        working_status = False
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="好的 若想要我繼續說話 請跟我說 「說話」"))
+        return
+
+    if working_status:
+        chatgpt.add_msg(f"HUMAN:{event.message.text}?\n")
+        reply_msg = chatgpt.get_response().replace("AI:", "", 1)
+        chatgpt.add_msg(f"AI:{reply_msg}\n")
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=reply_msg))
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
-    # app.run()
+if __name__ == "__main__":
+    app.run()
