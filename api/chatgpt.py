@@ -1,9 +1,11 @@
-from api.prompt import Prompt
-import os
 from openai import OpenAI
 client = OpenAI()
-
-client.api_key = os.getenv("OPENAI_API_KEY")
+  
+assistant = client.beta.assistants.create(
+  name="Math Tutor",
+  instructions="You are a personal math tutor. Write and run code to answer math questions.",
+  tools=[{"type": "code_interpreter"}],
+  model="gpt-4o",
 
 
 class ChatGPT:
